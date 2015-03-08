@@ -7,7 +7,6 @@ This is a simple set of helpers for using the appcache from a Rails application
 
 First, if you don't know what the appcache is, or you don't have (at least) a high-level understanding of how it works, read [A high-level overview of the appcache](https://github.com/meagar/rails_appcache/wiki/A-high-level-overview-of-the-appcache).
 
-
 ## How does rail_appcache help?
 
 This gem serves appcache manifests from `app/views/rails_appcache/manifests/<name>.appcache.erb`. You are (mostly) responsible for maintainig these files, but there is a generator for building them, and helpers for including things from the asset pipeline.
@@ -22,6 +21,11 @@ This gem provides the following:
   - `stylesheet_cache_path`
   - `asset_cache_path`
 
+## Example
+
+For a small example of usage, checkout <http://github.com/meagar/house-clock>, a simple count-down clock. [It's manifest](https://github.com/meagar/house-clock/blob/master/app/views/rails_appcache/manifests/application.appcache.erb) lists the JavaScript and CSS, the background image (house.jpg) and some external CDN-hosted assets for Bootstrap.
+
+It lists `NETWORK: *` so that vairous tracking scripts from New Relic and Heroku can be injected into the page and continue to work while online.
 
 ## Installation
 
@@ -51,13 +55,7 @@ Install the gem with `gem install rails_appcache`
   mount RailsAppcache::Engine => '/'
   ```
 
-2. Add the views directory (TODO: make this configurable)
-
-  ```bash
-  $ mkdir app/views/rails_appcache/manifests
-  ```
-
-3. Generate a new manifest called "application":
+2. Generate a new manifest called "application":
 
   ```bash
   $ rails g appcache_manifest application
@@ -94,11 +92,13 @@ Install the gem with `gem install rails_appcache`
   *
   ```
 
-4. Add any additional resources to cache to the manifest
+3. Add any additional resources to cache to the manifest
 
   Typically using path helpers. Your manifest might need to be quite long, but remember that you are limited to (roughly?) 5MB in most browsers.
   
-5. Configure versions/expiration
+4. Configure versions/expiration
+
+  There are sane defaults out-of-the-box, but you might want something specific to your usecase.
 
   Similar to the existing configuration setting Rails provides, `Rails.application.config.assets.version = '1.0'`, RailsAppcache provides a configuration value you should set/increment to expire your appcache manifests. This is actually pretty important; see `appcache_version_string` below.
 
