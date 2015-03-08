@@ -94,7 +94,25 @@ Install the gem with `gem install rails_appcache`
   *
   ```
 
-4. Add any additional resources to cache to the manifest, and you're done
+4. Add any additional resources to cache to the manifest
+
+  Typically using path helpers. Your manifest might need to be quite long, but remember that you are limited to (roughly?) 5MB in most browsers.
+  
+5. Configure versions/expiration
+
+  Similar to the existing configuration setting Rails provides, `Rails.application.config.assets.version = '1.0'`, RailsAppcache provides a configuration value you should set/increment to expire your appcache manifests. This is actually pretty important; see `appcache_version_string` below.
+
+  One typical solution is to use the Git commit ID which is currently deployed. If you're using Capistrano, this is availabe in a file called `REVISION` in the root of your project, if you're using Git as a deploy tool, you can use Git directly:
+  
+  ```
+  # config/application.rb
+  
+  # Capistrano
+  RailsAppcache.config.version = File.read(Rails.root.join('REVISION'))
+  
+  # Or, pure Git
+  RailsAppcache.config.version = `git rev-parse HEAD`.strip
+  ```
 
 ## `javascript_cache_path` and `stylesheet_cache_path`
 
@@ -158,6 +176,10 @@ CACHE:
 In production, you'll get the correctly fingerprinted URL.
 
 ## `appcache_version_string`
+
+Every request for a manifest contains a unique version string, such as `/application-1.0.appcache`. This allows us to tell whether the browser is making a request for the *current* version of a manifest, and if not, serve a 404, causing the obsolete appcache to be thrown out.  The closes the loop where a browser could have an old version of a cached file, request the new version, but fail to finish downloading the entire manifest before the user navigates. In this case (user navigation interrupting the manifest download), the browser would retain the old manifest, and continue to serve the legacy page if we weren't explicitly issuing a 404 and obsoleteing it.
+
+This also gives you a chance in JavaScript to listen for the obsoletion event, and potentially redirect the user to a dedicated update page.
 
 One common technique for expiring your appcache is to add a simple version string in a comment below the `CACHE MANIFEST` line. This helper outputs a continually changing string in development (the unix timestamp) and the current revision in production, meaning that each time you deploy your app (assuming you're using Capistrano) you will get a new appcache manifest and your clients will re-download your app.
 

@@ -1,22 +1,15 @@
 module RailsAppcache
   module ApplicationHelper
     def appcache_manifest_path(path)
-      "/#{path}.appcache"
+      return "" unless RailsAppcache.config.perform_caching?
+
+      "/#{path}-#{appcache_version_string}.appcache"
     end
 
     # In development, serve up a new manifest every time
     # In production, serve the current Git revision
     def appcache_version_string
-      if Rails.env.development?
-        Time.now.to_i.to_s
-      else
-        # Use the REVISION file left in root from capistrano
-        if File.exists?(Rails.root.join('REVISION'))
-          File.read(Rails.root.join('REVISION'))
-        else
-          `git rev-parse HEAD`
-        end
-      end
+      RailsAppcache.config.version
     end
 
     def stylesheet_cache_path(*paths)

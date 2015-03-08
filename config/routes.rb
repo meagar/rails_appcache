@@ -1,3 +1,3 @@
 RailsAppcache::Engine.routes.draw do
-  get ':manifest.appcache' => 'manifests#show', format: 'appcache'
+  get ':manifest-:version.appcache' => 'manifests#show', format: 'appcache', constraints: { version: /[a-zA-Z0-9.]+/ }
 end

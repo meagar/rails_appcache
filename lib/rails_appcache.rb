@@ -1,5 +1,6 @@
 require 'rails_appcache/engine'
 require 'rails_appcache/application_helper'
+require 'rails_appcache/config'
 
 module RailsAppcache
 end
