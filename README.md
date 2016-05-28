@@ -96,6 +96,20 @@ Install the gem with `gem install rails_appcache`
 
   Typically using path helpers. Your manifest might need to be quite long, but remember that you are limited to (roughly?) 5MB in most browsers.
   
+4. Include the manifest in your layout
+
+  Your `<html>` tag should have a manifest attribute, containing the URL for your manifest. You can use the helper method `appcache_manifest_path` to generate the correct URL:
+  
+      # ERB:
+      <html manifest="<%= appcache_manifest_path('application') %>">
+  
+      # Haml
+      %html{manifest: appcache_manifest_path('application')}
+      
+      # Slim:
+      html manifest=appcache_manifest_path('application')
+
+ 
 4. Configure versions/expiration
 
   There are sane defaults out-of-the-box, but you might want something specific to your usecase.
