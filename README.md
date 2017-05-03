@@ -1,7 +1,14 @@
+
+## Warning
+
+[The `AppCache` is deprecated](https://developer.mozilla.org/en-US/docs/Web/HTML/Using_the_application_cache) and while I loved it and it worked really well for what it was, using it now isn't a great idea.
+
+
+---
+
 # rails_appcache
 
 This is a simple set of helpers for using the appcache from a Rails application
-
 
 ## Why?
 
@@ -95,21 +102,21 @@ Install the gem with `gem install rails_appcache`
 3. Add any additional resources to cache to the manifest
 
   Typically using path helpers. Your manifest might need to be quite long, but remember that you are limited to (roughly?) 5MB in most browsers.
-  
+
 4. Include the manifest in your layout
 
   Your `<html>` tag should have a manifest attribute, containing the URL for your manifest. You can use the helper method `appcache_manifest_path` to generate the correct URL:
-  
+
       # ERB:
       <html manifest="<%= appcache_manifest_path('application') %>">
-  
+
       # Haml
       %html{manifest: appcache_manifest_path('application')}
-      
+
       # Slim:
       html manifest=appcache_manifest_path('application')
 
- 
+
 4. Configure versions/expiration
 
   There are sane defaults out-of-the-box, but you might want something specific to your usecase.
@@ -117,13 +124,13 @@ Install the gem with `gem install rails_appcache`
   Similar to the existing configuration setting Rails provides, `Rails.application.config.assets.version = '1.0'`, RailsAppcache provides a configuration value you should set/increment to expire your appcache manifests. This is actually pretty important; see `appcache_version_string` below.
 
   One typical solution is to use the Git commit ID which is currently deployed. If you're using Capistrano, this is availabe in a file called `REVISION` in the root of your project, if you're using Git as a deploy tool, you can use Git directly:
-  
+
   ```
   # config/application.rb
-  
+
   # Capistrano
   RailsAppcache.config.version = File.read(Rails.root.join('REVISION'))
-  
+
   # Or, pure Git
   RailsAppcache.config.version = `git rev-parse HEAD`.strip
   ```
@@ -200,4 +207,3 @@ One common technique for expiring your appcache is to add a simple version strin
 ### Doesn't this cause all of your assets to be expired on every single deploy?
 
 Yes, but that's how the appcache works. You cannot expire individual things in the cache; if the manifest changes, **every single file** cached by that manifest is re-downloaded, so it really doesn't matter if we get much more clever in expiring the manifest. Typically, if your app is heavy on JavaScript, you'll *probably* need ot fully expire the appcache on each deploy.
-
